@@ -33,7 +33,7 @@ var vite_config_default = defineConfig({
     }
   },
   root: path.resolve(__dirname, "client"),
-  base: "/",
+  base: "/gearheads-io/",
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true
