@@ -4,13 +4,12 @@ import Phaser from "phaser";
 export class UIScene extends Phaser.Scene {
   private scoreText!: Phaser.GameObjects.Text;
   private levelText!: Phaser.GameObjects.Text;
-  private inventoryContainer!: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: "UIScene" });
   }
 
-  create() {
+  create(data: unknown) {
     const { level, score } = appState;
 
     // Create UI elements
@@ -24,19 +23,29 @@ export class UIScene extends Phaser.Scene {
       color: "#ffffff",
     });
 
-    this.inventoryContainer = this.add.container(700, 300);
-
     // Listen for game events
     this.events.on("levelComplete", this.showLevelComplete, this);
     this.events.on("gameOver", this.showGameOver, this);
+
+    if (
+      typeof data === "object" &&
+      data &&
+      "style" in data &&
+      data.style === "levelComplete"
+    ) {
+      this.showLevelComplete();
+    } else {
+      this.showGameOver();
+    }
   }
 
   private showLevelComplete() {
-    this.showOverlay("Level Complete!", "Next Level", () => {
+    // "Next Level" button eventually
+    this.showOverlay("Level Complete!", "", () => {
       // Show ad before next level
-      // if (typeof window.adsbygoogle !== "undefined") {
-      //   window.dispatchEvent(new CustomEvent("showAd"));
-      // }
+      if (typeof (window as any).adsbygoogle !== "undefined") {
+        window.dispatchEvent(new CustomEvent("showAd"));
+      }
 
       // Load next level
       this.scene.start("GameScene");
@@ -46,9 +55,9 @@ export class UIScene extends Phaser.Scene {
   private showGameOver() {
     this.showOverlay("Game Over!", "Try Again", () => {
       // Show ad before retry
-      // if (window.adsbygoogle !== undefined) {
-      //   window.dispatchEvent(new CustomEvent("showAd"));
-      // }
+      if ((window as any).adsbygoogle !== undefined) {
+        window.dispatchEvent(new CustomEvent("showAd"));
+      }
 
       // Reset game state
       resetGame();
@@ -70,22 +79,24 @@ export class UIScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    const button = this.add
-      .text(400, 350, buttonText, {
-        fontSize: "32px",
-        color: "#ffffff",
-        backgroundColor: "#444444",
-        padding: { x: 20, y: 10 },
-      })
-      .setOrigin(0.5)
-      .setInteractive();
+    if (buttonText) {
+      const button = this.add
+        .text(400, 350, buttonText, {
+          fontSize: "32px",
+          color: "#ffffff",
+          backgroundColor: "#444444",
+          padding: { x: 20, y: 10 },
+        })
+        .setOrigin(0.5)
+        .setInteractive();
 
-    button.on("pointerup", () => {
-      callback();
-      overlay.destroy();
-      text.destroy();
-      button.destroy();
-    });
+      button.on("pointerup", () => {
+        callback();
+        overlay.destroy();
+        text.destroy();
+        button.destroy();
+      });
+    }
   }
 
   update() {

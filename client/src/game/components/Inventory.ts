@@ -1,12 +1,15 @@
-import { GearConfig } from '@shared/schema';
+import { GearConfig } from "@shared/schema";
 
 export class Inventory {
   private gears: GearConfig[];
-  
+
   constructor(initialGears: GearConfig[]) {
     this.gears = [...initialGears];
   }
 
+  size(): number {
+    return this?.gears?.length || 0;
+  }
   getGears(): GearConfig[] {
     return this.gears;
   }
@@ -16,6 +19,14 @@ export class Inventory {
       return this.gears.splice(index, 1)[0];
     }
     return undefined;
+  }
+
+  peekFirstGear(): GearConfig | null {
+    return this.gears[0] || null; // Removes and returns the first item, or null if empty
+  }
+
+  removeFirstGear(): GearConfig | null {
+    return this.gears.shift() || null; // Removes and returns the first item, or null if empty
   }
 
   addGear(gear: GearConfig) {
