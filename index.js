@@ -33,7 +33,7 @@ var vite_config_default = defineConfig({
     }
   },
   root: path.resolve(__dirname, "client"),
-  base: "/gearheads-io/",
+  base: "/",
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true
@@ -110,6 +110,7 @@ function serveStatic(app2) {
 }
 
 // server/index.ts
+import { exec } from "child_process";
 var app = express2();
 app.use(express2.json());
 app.use(express2.urlencoded({ extended: false }));
@@ -153,5 +154,8 @@ app.use((req, res, next) => {
   const PORT = 5001;
   server.listen(PORT, "0.0.0.0", () => {
     log(`serving on port ${PORT}`);
+    if (process.env.NODE_ENV === "development") {
+      exec(`open http://localhost:${PORT}`);
+    }
   });
 })();
